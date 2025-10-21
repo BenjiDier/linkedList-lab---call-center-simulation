@@ -1,0 +1,12 @@
+Alice waiting 3
+Bob waiting 5
+Charlie missed 4
+David waiting 2
+Emma missed 3
+Frank waiting 6
+Grace missed 2
+Henry waiting 4
+Ivy waiting 5
+Jack missed 3
+Kelly waiting 2
+Leo waiting 4
