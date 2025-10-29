@@ -18,8 +18,9 @@ public:
         next = nullptr;
     }
 };
+
 class LinkedList {
-protected:
+private:
     Node* head;
 public:
     LinkedList() {
@@ -33,7 +34,6 @@ public:
             current = nextNode;
         }
     }
-    bool isEmpty() { return head == nullptr; }
 
     // Iterate to a given position (0-based index)
     Node* iterate(int position) {
@@ -136,40 +136,59 @@ public:
     }
 };
 
-class Queue : public LinkedList{ // Queue for callers in order (waiting to be serviced).
+class Queue{ // Queue for callers in order (waiting to be serviced).
+private:
+    LinkedList list; // Linked list is provided...
 public:
+    bool isEmpty() { return list.size() == 0; } // Checks if the size of the list is 0 (empty) using size function.
 
     void enqueue(int value) {
-        append(value); // Enqueues by appending node by value.
+        list.append(value); // Enqueues by appending node by value.
     }
 
     int dequeue() { 
-        if (head == nullptr) {  // Case for empty list.
+
+        if (list.size() == 0) {  // Case for empty list.
             cout << "Queue is empty.\n"; 
             return -1; 
         } 
 
-        int value = head->data; // Temporary variable to contain removed data.
-        remove(value); // Uses remove function to erase node with given nodes value.
+        Node* front = list.iterate(0); // Temporary pointer to point to head.
+        int value = front->data; // Stores head data into temporary variable.
+        list.remove(value); // Uses remove function to erase node with given nodes value.
         return value; // Returns removed value.
     }
+
+    void display() {
+        list.display(); // Just uses display function from LinkedList class.
+    }
+
 };
 
-class Stack : public LinkedList{ // Stack for returning missed calls.
+class Stack{ // Stack for returning missed calls. Mostly the same logic.
+private:
+    LinkedList list; 
 public:
-
+    bool isEmpty() {
+        return list.size() == 0;
+    }
     void push(int value) {
-        prepend(value); // Adds value to the top of stack, at the head.
+        list.prepend(value); // Adds value to the top of stack, at the head.
     }
 
     int pop() {
-        if (head == nullptr) { // Case for empty list.
+        if (list.size() == 0) { // Case for empty list.
             cout << "Stack is empty.\n";
                 return -1;
         }
-        int value = head->data; // Temporary variable to contain popped data.
-        remove(value); // Same with removing with queue before.
+        Node* front = list.iterate(0); // Pointer to head node.
+        int value = front->data; // Temporary variable to contain popped data from head.
+        list.remove(value); // Same with removing with queue before.
         return value; // Returns popped value.
+    }
+
+    void display() {
+        list.display();
     }
 };
 
@@ -205,7 +224,7 @@ int main() {
     }
     
     if (!missed.isEmpty()) { // No loop needed cause its only one call.
-        int time = missed.pop(); // Same temp variable for dispaly.
+        int time = missed.pop(); // Same temp variable for display.
         cout << "Called back missed caller with service time: " << time << endl;
     }
     cout << "\n Remaining in waiting queue: ";
