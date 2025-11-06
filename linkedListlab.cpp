@@ -162,7 +162,10 @@ public:
     void display() {
         list.display(); // Just uses display function from LinkedList class.
     }
-
+    void peek() {
+        Node* temp = list.iterate(0);
+        cout << "Value at head of queue: " << temp->data << endl;
+    }
 };
 
 class Stack{ // Stack for returning missed calls. Mostly the same logic.
@@ -172,6 +175,12 @@ public:
     bool isEmpty() {
         return list.size() == 0;
     }
+
+    void peek() { // Peeks top of list.
+        Node* temp = list.iterate(0); // Takes a peek at the head of the list (which is the top of the stack)
+        cout << "Value at top of stack: " << temp->data << endl; // and dislays it.
+    }
+
     void push(int value) {
         list.prepend(value); // Adds value to the top of stack, at the head.
     }
@@ -204,8 +213,9 @@ int main() {
     customer c; // Customer struct to store each customer.
 
     while (file >> c.name >> c.state >> c.serviceTime) { // Extracting data from file into struct.
-        if (c.state == "waiting") { waiting.enqueue(c.serviceTime); } // Separating between missing and waiting calls through tags in the txt file.
-        else if (c.state == "missed")
+        if (c.state == "waiting") { waiting.enqueue(c.serviceTime); } // Push to queue if contains tag "waiting".
+
+        else if (c.state == "missed") // Push to stack if contains tag "missed".
             missed.push(c.serviceTime);
     }
     file.close();
@@ -215,20 +225,26 @@ int main() {
     cout << "Initial missed call stack (service times): ";
     missed.display();
 
-    // After serving 3 calls...
-    for (int i = 0; i < 3 && !waiting.isEmpty(); i++) {
+    cout << '\n';
 
-        int time = waiting.dequeue(); // Temp variable to hold time for current displayed caller.
-        cout << "Served customer with service time: " << time << endl;
+    // We want a while loop that goes through both waiting and missed until both are empty (served). The order needed is to serve 3 waiting calls, then 1 missed.
+    while (!waiting.isEmpty() || !missed.isEmpty()) { 
+        // We serve 3 calls, and then 1 missed.
+        for (int i = 0; i < 3; i++) { // Loop to serve 3 waiting callers.
+
+            int time = waiting.dequeue(); // Temp variable to hold time for current displayed caller.
+
+            if (time == -1) // Fix for weird bug that prints that it served customer with time -1. Basically checks if the queue is empty again
+                break;      // and breaks the service loop if it is (so that it doesn't go into the negatives)
+
+            cout << "Served customer with service time : " << time << endl;
+        }
+            if (!missed.isEmpty()) { // Serves one missed call.
+                int time = missed.pop(); // Same temp variable for display.
+                cout << "Called back missed caller with service time: " << time << endl;
+            }
 
     }
     
-    if (!missed.isEmpty()) { // No loop needed cause its only one call.
-        int time = missed.pop(); // Same temp variable for display.
-        cout << "Called back missed caller with service time: " << time << endl;
-    }
-    cout << "\n Remaining in waiting queue: ";
-    waiting.display();
-    cout << " Remaining missed callers: ";
-    missed.display();
+    
 }
